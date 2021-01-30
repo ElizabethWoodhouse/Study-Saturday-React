@@ -1,47 +1,52 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import axios from 'axios';
+import StudentList from './StudentList';
+import SingleStudent from './SingleStudent';
 
-export default class Main extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      students: [],
-    };
-  }
-
-  componentDidMount() {
-    this.getStudents();
-  }
-
-  async getStudents() {
-    console.log('fetching');
-    try {
-      const { data } = await axios.get('/student');
-      this.setState({ students: data });
-    } catch (err) {
-      console.error(err);
+export default class Students extends React.Component {
+    constructor () {
+        super ()
+        this.state = {
+            students: [],
+            singleStudent : {}
+        }
+        this.selectStudent = this.selectStudent.bind(this);
     }
-  }
-
-  render() {
-    return (
-      <div>
-        <h1>Students</h1>
-        <table>
-          <tbody>
-            <tr>
-              <th>Name</th>
-            </tr>
-            {this.state.students.map(student => {
-              return (
-                <tr key={student.id}>
-                  <td>{student.fullName}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+    async componentDidMount () {
+        try{
+            const response = await axios.get('/student');
+            this.setState ({
+                students: response.data
+            })
+        } catch(err) {
+            console.err(err);
+        }
+    };
+    selectStudent (student) {
+        this.setState({ singleStudent : student });
+    };
+    render() {
+        console.log('state in main', this.state);
+        return (
+        <div>
+            <h1>Students</h1>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <th>Tests </th>
+                    </tr>
+                    <thread>
+                        <StudentList students={this.state.students} selectStudent = {this.selectStudent} />
+                    </thread>
+                </tbody>
+            </table>
+            {this.state.singleStudent.id ? <SingleStudent chosenStudent = {this.state.singleStudent} />: null}
+        </div>
+        )
+    }
 }
+
+
+
+
